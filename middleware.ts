@@ -1,31 +1,16 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { cookies } from "next/headers"
+import type { NextRequest } from "next/server"
+import { auth0 } from "./lib/auth0"
+import { myvoltAuth0 } from "./lib/myvolt-auth0"
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-
-  // Skip middleware for auth routes
-  if (pathname.startsWith("/api/auth")) {
-    return NextResponse.next()
+  // Route /myvolt requests to staff Auth0 client
+  if (request.nextUrl.pathname.startsWith("/myvolt")) {
+    return await myvoltAuth0.middleware(request)
   }
-
-  // Check for session cookie
-  const cookieStore = await cookies()
-  const sessionCookie = cookieStore.get("volt_session")
-
-  // Protected routes that require authentication
-  const protectedRoutes = ["/myvolt", "/request", "/settings", "/apply"]
-  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route))
-
-  if (isProtectedRoute && !sessionCookie) {
-    // Redirect to login if no session
-    const loginUrl = new URL("/api/auth/login", request.url)
-    return NextResponse.redirect(loginUrl)
-  }
-
-  return NextResponse.next()
+  // Route public VoltRadio requests to public Auth0 client
+  return await auth0.middleware(request)
 }
 
 export const config = {
-  matcher: ["/myvolt/:path*", "/request", "/settings", "/apply", "/api/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)"],
 }
