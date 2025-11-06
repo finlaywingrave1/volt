@@ -1,3 +1,5 @@
+export const runtime = "nodejs"
+
 import { type NextRequest, NextResponse } from "next/server"
 import { publicAuthConfig, createAuth0Urls } from "@/lib/auth0-config"
 import { generateCodeVerifier, generateCodeChallenge, generateState } from "@/lib/pkce"
