@@ -1,16 +1,12 @@
-import type { NextRequest } from "next/server"
-import { auth0 } from "./lib/auth0"
-import { myvoltAuth0 } from "./lib/myvolt-auth0"
+import { auth0 } from "./lib/auth0"; // Import the Auth0 client
 
 export async function middleware(request: NextRequest) {
-  // Route /myvolt requests to staff Auth0 client
-  if (request.nextUrl.pathname.startsWith("/myvolt")) {
-    return await myvoltAuth0.middleware(request)
-  }
-  // Route public VoltRadio requests to public Auth0 client
-  return await auth0.middleware(request)
+  return auth0.middleware(request); // Use the Node.js middleware
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)"],
-}
+  matcher: [
+    // Protect all routes except Next.js assets and public files
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+  ],
+};
